@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="en">
+
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="chrome=1">
+		<meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+		<title>CircleMarker</title>
+		<style type="text/css">
+			html,
+			body,
+			#map {
+				width: 100%;
+				height: 100%;
+				margin: 0;
+			}
+			
+			.info {
+				border: solid 1px silver;
+			}
+			
+			div.info-top {
+				position: relative;
+				background: none repeat scroll 0 0 #F9F9F9;
+				border-bottom: 1px solid #CCC;
+				border-radius: 5px 5px 0 0;
+			}
+			
+			div.info-top div {
+				display: inline-block;
+				color: #333333;
+				font-size: 14px;
+				font-weight: bold;
+				line-height: 31px;
+				padding: 0 10px;
+			}
+			
+			div.info-top img {
+				position: absolute;
+				top: 10px;
+				right: 10px;
+				transition-duration: 0.25s;
+			}
+			
+			div.info-top img:hover {
+				box-shadow: 0px 0px 5px #000;
+			}
+			
+			div.info-middle {
+				font-size: 12px;
+				padding: 6px;
+				line-height: 20px;
+			}
+			
+			div.info-bottom {
+				height: 0px;
+				width: 100%;
+				clear: both;
+				text-align: center;
+			}
+			
+			div.info-bottom img {
+				position: relative;
+				z-index: 104;
+			}
+			
+			span {
+				margin-left: 5px;
+				font-size: 11px;
+			}
+			
+			.info-middle img {
+				float: left;
+				margin-right: 6px;
+			}
+		</style>
+		<script type="text/javascript" src='https://a.amap.com/jsapi_demos/static/resource/capitals.js'></script>
+		<script type="text/javascript" src='https://webapi.amap.com/maps?v=1.4.10&key=申请的key'></script>
+	</head>
+
+	<body>
+		<div id="map"></div>
+		<script>
+			var map = new AMap.Map('map', {
+				//viewMode: '3D',
+				zoom: 4,
+				center: [108, 34]
+			})
+			/*var list={
+          "size":4,
+          "data":[
+            {"x":116.397428,"y": 39.921883},
+            {"x":116.397428,"y": 39.920213},
+            {"x":116.403322,"y": 39.922282},
+            {"x":116.403322,"y": 39.920249}
+          ]
+        }
+
+        for(var j = 0,map;j < list.size; j++){
+            var myObj= list.data[j];
+            var myLngLat=new AMap.LngLat(myObj.x,myObj.y);
+            console.log(circle.contains(myLngLat));
+          if(circle.contains(myLngLat)){//如果点在圆内则输出
+              var marker = new AMap.Marker({
+                   position: myLngLat,
+                   map: map
+               });
+          }
+
+        }*/
+			var list = {
+				"size": 4,
+				"data": [{
+						"x": 116.39564503787867,
+						"y": 39.92998577808024
+					},
+					{
+						"x": 113.3948175587587,
+						"y": 23.40800372902474
+					},
+					{
+						"x": 116.403322,
+						"y": 39.922282
+					},
+					{
+						"x": 116.403322,
+						"y": 39.920249
+					}
+				]
+			}
+			var circleMarker;
+			var title;
+			for(var i = 0; i < list.size; i += 1) {
+				var myObj = list.data[i];
+				var myLngLat = new AMap.LngLat(myObj.x, myObj.y);
+				//alert(myLngLat);
+				circleMarker = new AMap.CircleMarker({
+					center: myLngLat,
+					radius: 20 + Math.random() * 20, //3D视图下，CircleMarker半径不要超过64px
+					strokeColor: 'white',
+					strokeWeight: 2,
+					strokeOpacity: 0.5,
+					fillColor: 'red',
+					fillOpacity: 0.5,
+					zIndex: 10,
+					bubble: true,
+					cursor: 'pointer',
+					clickable: true,
+					//position: myLngLat
+
+				})
+				circleMarker.setMap(map);
+
+				circleMarker.myLngLat = myLngLat;
+				
+				circleMarker.on('click', function(e) {
+					//实例化信息窗体
+				title = '方恒假日酒店<span style="font-size:11px;color:#F00;">价格:318</span>'+e.target.myLngLat,
+					content = [];
+				content.push("<img src='http://tpc.googlesyndication.com/simgad/5843493769827749134'>地址：北京市朝阳区阜通东大街6号院3号楼东北8.3公里");
+				content.push("电话：010-64733333");
+				content.push("<a href='https://ditu.amap.com/detail/B000A8URXB?citycode=110105'>详细信息</a>");
+				
+					var infoWindow = new AMap.InfoWindow({
+					isCustom: true, //使用自定义窗体
+					content: createInfoWindow(title, content.join("<br/>")),
+					offset: new AMap.Pixel(16, -45)
+					
+					
+				});
+					infoWindow.open(map, e.lnglat);
+				});
+				
+					//infoWindow.setContent("哈哈");
+					
+				
+
+			}
+			
+
+				
+
+				//构建自定义信息窗体
+				function createInfoWindow(title, content) {
+					var info = document.createElement("div");
+					info.className = "info";
+
+					//可以通过下面的方式修改自定义窗体的宽高
+					//info.style.width = "400px";
+					// 定义顶部标题
+					var top = document.createElement("div");
+					var titleD = document.createElement("div");
+					var closeX = document.createElement("img");
+					top.className = "info-top";
+					titleD.innerHTML = title;
+					closeX.src = "https://webapi.amap.com/images/close2.gif";
+					closeX.onclick = closeInfoWindow;
+
+					top.appendChild(titleD);
+					top.appendChild(closeX);
+					info.appendChild(top);
+
+					// 定义中部内容
+					var middle = document.createElement("div");
+					middle.className = "info-middle";
+					middle.style.backgroundColor = 'white';
+					middle.innerHTML = content;
+					info.appendChild(middle);
+
+					// 定义底部内容
+					var bottom = document.createElement("div");
+					bottom.className = "info-bottom";
+					bottom.style.position = 'relative';
+					bottom.style.top = '0px';
+					bottom.style.margin = '0 auto';
+					var sharp = document.createElement("img");
+					sharp.src = "https://webapi.amap.com/images/sharp.png";
+					bottom.appendChild(sharp);
+					info.appendChild(bottom);
+					return info;
+				}
+
+				//关闭信息窗体
+				function closeInfoWindow() {
+					map.clearInfoWindow();
+				}
+		</script>
+	</body>
+
+</html>
